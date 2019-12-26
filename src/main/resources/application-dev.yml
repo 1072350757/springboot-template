@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true
+    username: root
+    password: rootroot
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.baronj.template.entity.Test
+
+#showSql
+logging:
+  level:
+    com:
+      baronj:
+        template:
+          mapper : debug

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baronj.template.mapper.TestMapper">
+
+    <resultMap id="BaseResultMap" type="com.baronj.template.entity.Test">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="age" jdbcType="INTEGER" property="age"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id,name,age
+    </sql>
+
+    <insert id="insertOne" parameterType="com.baronj.template.entity.Test">
+        insert into test (id,name,age)
+        values (#{id}, #{name}, #{age})
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long">
+       delete from test where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.baronj.template.entity.Test">
+        update test
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            age = #{age},
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="get" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="BaseColumnList"/>
+        from test where id = #{id}
+    </select>
+
+    <select id="query" resultMap="BaseResultMap">
+        select
+        <include refid="BaseColumnList"/>
+        from test
+    </select>
+
+</mapper>
