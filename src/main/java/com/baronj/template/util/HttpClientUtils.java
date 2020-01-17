@@ -7,6 +7,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -102,6 +104,66 @@ public class HttpClientUtils {
             }
         }
         return responseContent;
+    }
+
+    /**
+     * 模拟登录获取cookie
+     *
+     * @param url
+     * @param headers
+     * @param params
+     * @return
+     */
+    public static String loginGetCookie(String url, Map<String, String> headers, Map<String, Object> params) {
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        CloseableHttpClient httpClient = null;
+        HttpPost httpPost;
+        CloseableHttpResponse response = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpPost = new HttpPost(url);
+            if (headers != null && headers.size() > 0) {//设置请求头
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    httpPost.addHeader(entry.getKey(), entry.getValue());
+                }
+            }
+            if (params != null && params.size() > 0) {//设置参数
+                List<NameValuePair> pairList = new ArrayList<>(params.size());
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry
+                            .getValue().toString());
+                    pairList.add(pair);
+                }
+                httpPost.setEntity(new UrlEncodedFormEntity(pairList, StandardCharsets.UTF_8));
+            }
+            response = httpClient.execute(httpPost);
+            if (response == null || response.getStatusLine() == null) {
+                return null;
+            }
+            // 获取cookies信息
+            List<Cookie> cookies = cookieStore.getCookies();
+            for (Cookie cookie : cookies) {
+                String name = cookie.getName();
+                String value = cookie.getValue();
+                sb.append(name).append("=").append(value).append(";");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // 关闭连接,释放资源
+                if (response != null) {
+                    response.close();
+                }
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
     }
 
 }
