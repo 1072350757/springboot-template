@@ -71,10 +71,35 @@ public class PropertiesService {
             Properties properties = propertiesMapper.selectOne(wrapper);
             String cookie = properties.getValue();
 
-            String url = "http://www.dmzshequ.com/plugin.php?id=yinxingfei_zzza:yinxingfei_zzza_hall&yjjs=yes";
+            //获取hash
+            String yyyPage = "http://www.dmzshequ.com/plugin.php?id=yinxingfei_zzza:yinxingfei_zzza_hall";
             Map<String, String> headers = new TreeMap<>();
             headers.put("cookie", cookie);
             headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
+            String yyyPageContent = HttpClientUtils.doGet(yyyPage, headers);
+            String key = "<input type=\"hidden\" name=\"formhash\" value=\"";
+            String formhash = yyyPageContent.substring(yyyPageContent.indexOf(key), yyyPageContent.indexOf(key) + key.length() + 8).replace(key, "");
+
+            //摇一摇
+            String yyyUrl = "http://www.dmzshequ.com/plugin.php?id=yinxingfei_zzza:yinxingfei_zzza_post";
+            headers.put("Host", "www.dmzshequ.com");
+            headers.put("Connection", "keep-alive");
+            headers.put("Cache-Control", "max-age=0");
+            headers.put("Origin", "http://www.dmzshequ.com");
+            headers.put("Upgrade-Insecure-Requests", "1");
+            headers.put("Content-Type", "application/x-www-form-urlencoded");
+            headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+            headers.put("Referer", "http://www.dmzshequ.com/plugin.php?id=yinxingfei_zzza:yinxingfei_zzza_hall");
+            headers.put("Accept-Encoding", "gzip, deflate");
+            headers.put("Accept-Language", "zh-CN,zh;q=0.9");
+            Map<String, Object> param = new TreeMap<>();
+            param.put("formhash", formhash);
+            String response = HttpClientUtils.doPost(yyyUrl, headers, param);
+            response = response.substring(response.indexOf("<div id=\"messagetext\""), response.indexOf("<div id=\"messagetext\"") + 100);
+            System.out.println(response);
+
+            //查询摇奖得到的金币数
+            String url = "http://www.dmzshequ.com/plugin.php?id=yinxingfei_zzza:yinxingfei_zzza_hall&yjjs=yes";
             String content = HttpClientUtils.doGet(url, headers);
             String t = "<p style=\"font-size:14px;\">";
             content = content.substring(content.indexOf(t), content.indexOf(t) + t.length() + 23).replace(t, "");

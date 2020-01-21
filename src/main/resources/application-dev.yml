@@ -18,7 +18,6 @@ spring:
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml
-  type-aliases-package: com.baronj.template.entity.Test
 
 #showSql
 logging:
